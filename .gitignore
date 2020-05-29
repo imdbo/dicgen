@@ -1,0 +1,5 @@
+/wikiextractor
+/extracted
+enwiki*.*
+*.csv
+*.txt
