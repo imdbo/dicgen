@@ -3,3 +3,8 @@
 enwiki*.*
 *.csv
 *.txt
+*.vec
+*.vec.1
+*.bin
+text/
+/text

@@ -4,40 +4,18 @@ from bs4 import BeautifulSoup
 import mwparserfromhell
 import pandas as pd
 import subprocess
-import xml.sax
 import re
 import os
-
-
-class WikiXmlHandler(xml.sax.handler.ContentHandler):
-    """Content handler for Wiki XML data using SAX"""
-    def __init__(self):
-        xml.sax.handler.ContentHandler.__init__(self)
-        self._buffer = None
-        self._values = {}
-        self._current_tag = None
-        self._pages = []
-
-    def characters(self, content):
-        """Characters between opening and closing tags"""
-        if self._current_tag:
-            self._buffer.append(content)
-
-    def startElement(self, name, attrs):
-        """Opening tag of element"""
-        if name in ('title', 'text'):
-            self._current_tag = name
-            self._buffer = []
-
-    def endElement(self, name):
-        """Closing tag of element"""
-        if name == self._current_tag:
-            self._values[name] = ' '.join(self._buffer)
-
-        if name == 'page':
-            self._pages.append((self._values['title'], self._values['text']))
-
-
+import sys
+import json
+if len(sys.argv) > 1:
+    folder = sys.argv[0]
+    short_article_len = sys.argv[1]
+else:
+    folder = 'text/'
+    short_article_len = 512
+#uncomment to download
+'''
 base_url = 'https://dumps.wikimedia.org/enwiki/'
 index = requests.get(base_url).text
 soup_index = BeautifulSoup(index, 'html.parser')# Find the links on the page
@@ -47,37 +25,35 @@ dumps = [a['href'] for a in soup_index.find_all('a') if
 dump_date = dumps[-2].replace('/', '')
 dump_url = f"https://dumps.wikimedia.org/enwiki/{dump_date}/enwiki-{dump_date}-pages-articles-multistream.xml.bz2"
 
-#uncomment to download
 os.system(f'/bin/bash -c "wget {dump_url}"')
 os.system(f"python3 wikiextractor/WikiExtractor.py -cb 250K -o extracted {dump_url}")
+'''
 
-# Object for handling xml
-handler = WikiXmlHandler()# Parsing object
-parser = xml.sax.make_parser()
-parser.setContentHandler(handler)
+to_df = {"headword": [], "long_entry": []} #dict to parse into dataframe with pandas
+stats_df = {"longest full article": 0, "number of articles": 0}
 
-to_df = {"headword": [], "long_entry": [], "short_entry": []} #dict to parse into dataframe with pandas
-regex_section = re.compile(r'==(=)?.*==(=)?') #regex to split article into sections
+file_count = 0 
+for root, dirs, files in os.walk(folder):
+    for name in files:
+            path=(root + "/" + name)
+            file_count += 1
+            with open(path, 'r', encoding= 'utf-8') as articles:
+                    for line in articles:
+                        try:
+                            article = json.loads(line)
+                            article_len = len(article['text'])
+                            print(f'{file_count}--{article["title"]}', end='\r')
+                            if article_len > stats_df['longest full article']:
+                                stats_df['longest full article'] = article_len
 
-data_path = 'enwiki-20200520-pages-articles-multistream.xml.bz2' # Iterate through compressed file one line at a time
-with open('test.txt', 'w+', encoding='utf-8') as t:
-    for line in subprocess.Popen(['bzcat'], 
-                                stdin = open(data_path), 
-                                stdout = subprocess.PIPE).stdout:
-        parser.feed(line)
-        #t.write(str(line.decode("utf-8") ) + "\n")
-        # Stop when 3 articles have been found
-        if len(handler._pages) > 2:
-            break
-        
-    for p in handler._pages:
-        to_df['headword'].append(p[0])
-        cleanup = mwparserfromhell.parse(p[1]).strip_code().strip()
-        cleanup = re.split(regex_section, cleanup)
-        to_df['long_entry'].append(cleanup)
-        to_df['short_entry'].append('faket')
-        
-    df = pd.DataFrame.from_dict(to_df)
-    df.to_csv("stats_dump.csv")
-    for el in handler._pages[1]:
-        print(f"{el} \n------------------------------------------------------------------")
+                            to_df['headword'].append(article['title'])
+                            to_df['long_entry'].append(article['text'])
+                        except Exception as e:
+                            print(f'{e}--\n{line}')
+
+            if file_count >= 100:
+                df_articles = pd.DataFrame.from_dict(to_df)
+                df_articles.to_csv('data.csv', mode='a+')
+                to_df = {"headword": [], "long_entry": []} #dict to parse into dataframe with pandas
+                file_count = 0 
+                

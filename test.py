@@ -1,14 +1,26 @@
-import requests
-from gensim.models import KeyedVectors
-from gensim.test.utils import datapath
+'''from nltk.corpus import wordnet as wn
 
-w2v = KeyedVectors.load_word2vec_format(datapath(path_w2v), binary=False)  
-word = 'house'
-r = requests.get(f"https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=json&titles={word}&rvslots=main")
-r.status_code
-r.headers['content-type']
-r.encoding
-r.text
-result = r.json()
-print(result['query']['pages'])
-print(result["contentmodel"])
+synonyms=[]
+for word in wn.words():
+    print (word,end=":")
+    for syn in wn.synsets(word):
+      for l in syn.lemmas():
+        synonyms.append(l.name())
+    print(set(synonyms),end="\n")
+    synonyms.clear()
+
+#https://www.geeksforgeeks.org/get-synonymsantonyms-nltk-wordnet-python/
+
+#https://www.programcreek.com/python/example/91604/nltk.corpus.wordnet.synsets
+
+#https://spacy.io/universe/project/pyInflectw
+'''
+
+import spacy
+import lemminflect
+
+nlp = spacy.load('en_core_web_sm')
+doc = nlp('I am testing this example.')
+doc[2]._.lemma()  
+for w in doc:       # 'test'
+    print(w._.inflect('NNS'))  # 'examples'
