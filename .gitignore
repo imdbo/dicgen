@@ -8,3 +8,5 @@ enwiki*.*
 *.bin
 text/
 /text
+__pycache__/
+/__pycache__
