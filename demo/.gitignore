@@ -1,0 +1,12 @@
+/wikiextractor
+/extracted
+enwiki*.*
+*.csv
+*.txt
+*.vec
+*.vec.1
+*.bin
+text/
+/text
+__pycache__/
+/__pycache__
