@@ -1,44 +1,81 @@
 {% include 'dictionary/index.html' %}
 
 {% block info %}
-<div class="container">
-    <div class="row mt-5 text-center justify-content-center">
-        <h2 class="title mt-5">{{section_1.title}}</h2>
-        <p class="mt-2">{{section_1.info}}</p>
-    </div>
-    <div class="row mt-5">
-        <div class="col-lg text-center mx-auto ">
-            <div class="card" style="width: 20rem; margin:auto">
-                <div class="card-body">
-                    <i data-feather="activity"></i> 
-                <h5 class="card-title">{{section_1.card_1.card_title}}</h5>
-                <p class="card-text">{{section_1.card_1.card_content}}</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-            </div>
-        </div>
+<div class="container-fluid ">
+    <div class="row centrado50 justify-content-center">
         <div class="col-lg text-center mx-auto">
-            <div class="card  text-center" style="width: 20rem; margin:auto">
-                <div class="card-body">
-                    <i data-feather="activity"></i>
-                <h5 class="card-title">{{section_1.card_2.card_title}}</h5>
-                <p class="card-text">{{section_1.card_2.card_content}}</p></p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+            <div class="row mt-5 text-center centrado50 justify-content-center">
+                <div class="col-lg text-center mx-auto">
+                    <h2 class="title mt-5">{{section_1.title}}</h2>
+                    <hr>
+                    <p class="mt-2">{{section_1.info}}</p>
                 </div>
             </div>
-        </div>
-        <div class="col-lg text-center mx-auto">
-            <div class="card" style="width: 20rem; margin:auto">
-                <div class="card-body">
-                    <i data-feather="activity"></i>
-                <h5 class="card-title">{{section_1.card_3.card_title}}</h5>
-                <p class="card-text">{{section_1.card_3.card_content}}</p></p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
+            <div class="row mt-5">
+                <div class="col-lg text-center mx-auto ">
+                    <div class="card" style="width: 20rem; margin:auto">
+                        <div class="card-body">
+                            <i data-feather="activity"></i>
+                            <h5 class="card-title">{{section_1.card_1.card_title}}</h5>
+                            <p class="card-text">{{section_1.card_1.card_content}}</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg text-center mx-auto">
+                    <div class="card  text-center" style="width: 20rem; margin:auto">
+                        <div class="card-body">
+                            <i data-feather="activity"></i>
+                            <h5 class="card-title">{{section_1.card_2.card_title}}</h5>
+                            <p class="card-text">{{section_1.card_2.card_content}}</p>
+                            </p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg text-center mx-auto">
+                    <div class="card" style="width: 20rem; margin:auto">
+                        <div class="card-body">
+                            <i data-feather="activity"></i>
+                            <h5 class="card-title">{{section_1.card_3.card_title}}</h5>
+                            <p class="card-text">{{section_1.card_3.card_content}}</p>
+                            </p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row h-33">
+    <div class="col-lg text-center mx-auto gray">
+    <div class="row centrado50 mt-5 justify-content-center ">
+        <div class="col-lg text-center mx-auto">
+            <div class="row mt-5 text-center centrado50 justify-content-center">
+                <div class="col-lg text-center mx-auto">
+                    <h2 class="title mt-5">{{section_2.title}}</h2>
+                    <hr>
+                    <p class="mt-2">{{section_2.info}}</p>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="card centrado50 padded015" style="width: 20rem;">
+                    <div class="card-body">
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                </div>
+                <div class="card centrado50 padded015" style="width: 20rem;">
+                    <div class="card-body">
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                </div>
+                <div class="card centrado50 padded015" style="width: 20rem;">
+                    <div class="card-body">
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 </div>
 {% endblock %}
@@ -48,5 +85,5 @@
 </style>
 
 <script>
-    feather.replace({ class: 'activity', 'stroke-width': 2.25, 'height': 100, 'width': 100, 'color': 'blue' })
-  </script>
+    feather.replace({ class: 'activity', 'stroke-width': 1.25, 'height': 100, 'width': 100, 'color': 'lightbue' })
+</script>

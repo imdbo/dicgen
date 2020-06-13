@@ -90,6 +90,7 @@ class Summary():
                 ranked_text = self.calculate_similarity(self.sentences_to_matrix(article))
                 print(ranked_text)
                 if lemma not in results:
+                    results[lemma] = {}
                     results[lemma]['definitions'] = ['.'.join([article[k] for k in ranked_text])]
                 else:
                     results[lemma]['definitions'].append('.'.join([article[k] for k in ranked_text]))
@@ -176,31 +177,39 @@ text_rank = Summary(vocab)
 text_rank_summaries = text_rank.summarize_vocabulary()
 
 for lemma in map_vector_lemmas:
+    map_import[lemma] = {}
     map_import[lemma]["vector_lemmas"] = map_vector_lemmas[lemma]
     map_import[lemma]['definitions'] = text_rank_summaries[lemma]['definitions']
     map_import[lemma]['inflection'] = vocab.lemma_inflection[lemma]
     map_import[lemma]['collocations'] = ['test', 'test']
 
-for lemma, data in map_import:
+for lemma, data in map_import.items():
     singular = data['inflection']
     plural = data['inflection']
-    collocations = data['collocations']
+    collocations = [Collocation.objects.get_or_create(collocation=c) for c in data['collocations']]
 
     for d in data['definitions']:
         new_def = Definition.objects.get_or_create(
             definition = d,
             singular = singular,
             plural = plural,
-            collocations = collocations
         )
-    Lemma.objects.get_or_create(
-        lemma = lemma, 
-        definition = new_def, 
-        )
+        #new_def.collocations.add(Lemma.objects.get(collocation=c) for callable in collocations)
+        print(new_def)
+        print('----')
+        new_def = new_def[0]
+        print(new_def.id)
+
+        #Places.objects.get(name='kansas')
+        #print place.id
+        le = Lemma.objects.get_or_create(
+            lemma = lemma, 
+            )
+        le[0].definition.add(new_def) 
 
 #vector lemmas after all imported
 
-for lemma, data in map_import:
+for lemma, data in map_import.items():
     vector_lemmas = [l for l in data['vector_lemmas'] if l in map_import]
     if vector_lemmas:
         lemma = Lemma.objects.get(lemma=lemma)

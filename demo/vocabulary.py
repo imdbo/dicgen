@@ -25,7 +25,7 @@ class Vocabulary():
     """
     def __init__(self,
                 encoding: str = 'utf-8', 
-                max_lemmas: int = 30, 
+                max_lemmas: int = 30000, 
                 size_sentence: int = 15, 
                 size_short_article:int = 350,
                 top_n_sentences_lemma: int = 10, 
@@ -56,6 +56,7 @@ class Vocabulary():
             Since we are using Wikipedia to generate articles, we won't find articles as lemmas
         '''
         pos_occurences = {} #store all pos of the lemma inside the article. We take the most frequent one for the inflection.
+        most_common = 'NN' # Noun by default to have something to add. 
 
         parsed_article = spacy_parser(article)
         for token in parsed_article:
@@ -64,9 +65,9 @@ class Vocabulary():
                     pos_occurences[token.tag_] = 1
                 else:
                     pos_occurences[token.tag_] += 1
-
-        most_common = max(pos_occurences, key=lambda k: pos_occurences[k])
-        #if most_common == 'VERB' or most_common == 'NOUN':
+        if pos_occurences:
+            most_common = max(pos_occurences, key=lambda k: pos_occurences[k])
+            #if most_common == 'VERB' or most_common == 'NOUN':
 
         inflection = getInflection((lemma), tag=most_common)
         #https://pypi.org/project/inflect/0.2.4/
@@ -96,7 +97,7 @@ class Vocabulary():
 
     def build(self):
         words_only = re.compile(r'\w+')
-        full_df = pd.read_csv(self.data_df, low_memory=False, chunksize=30000)
+        full_df = pd.read_csv(self.data_df, low_memory=False, chunksize=300000)
         for df in full_df:
             headwords = df['headword'].to_numpy()
             full_articles = df['long_entry'].to_numpy()
