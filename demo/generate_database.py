@@ -5,10 +5,10 @@
 '''
 
 class DB_connection():
-    self.db = MySQLdb.connect(host="localhost",    # your host, usually localhost
-                     user="john",         # your username
-                     passwd="megajonhy",  # your password
-                     db="jonhydb")  
+    self.db = MySQLdb.connect(host="localhost",   
+                     user="",         
+                     passwd="",  
+                     db="")  
     def insert():
         return
     

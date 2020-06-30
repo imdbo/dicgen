@@ -1,15 +1,16 @@
 
 <div id="searchbox">
-    <form type="get" action="/search_lemma/">
-        <input type="text" class="form-control" id="search_box" placeholder="Input a lemma">
+    <form method="GET" action="/search_lemma/">
+        <input  type="search" name="search_box" class="form-control" id="search_box" placeholder="Input a lemma">
     </form>
+    <div id="results"></div>
 </div>
 
 <style>
     #searchbox
     {
         text-align: center;
-        padding-top: 20rem;
+        padding-top: 7.25%;
         margin: auto;
         width: 40%
     }

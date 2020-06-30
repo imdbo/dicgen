@@ -1,0 +1,45 @@
+{% include 'dictionary/index.html' %}
+
+{% block results %}
+<div class="container ">
+    <div class="row">
+        <div class="col-lg mx-auto ">
+        {% for r in results %}
+        <div class="row">
+            <div class="col-lg">
+                <div class="row">
+                    <h1>{{ r }}</h1>
+                </div>
+                {% for definition in r.definition.all %}
+                    <div class="row">
+                        <h5 class="mr-3">{{texts.definition}}</h5>
+                        <div class="row text-left pr-5 pl-5">   
+                            <p class="mr-5">{{ definition.definition }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <h5 class="mr-3">{{texts.singular}}</h5><p>{{ definition.singular }}</p>
+                    </div>
+                    <div class="row ">
+                        <h5 class="mr-3">{{texts.plural}}</h5><p>{{ definition.plural }}</p>
+                    </div>
+                    <div class="row">
+                        <h5 class="mr-3">{{texts.collocations}}</h5>
+                        {% for c in definition.collocations.all %}
+                            <p>{{ c.collocation }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="row">
+                        <h5>{{texts.related}}</h5>
+                        <h5>{{texts.word2vec}}</h5>
+                    </div>
+
+                    <hr>
+            {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

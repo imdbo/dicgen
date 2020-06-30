@@ -20,7 +20,6 @@ class Definition(models.Model):
     definition = models.CharField(max_length=5000)
     singular = models.CharField(max_length=20)
     plural = models.CharField(max_length=20)
-    singular = models.CharField(max_length=20)
     collocations = models.ManyToManyField(Collocation)
     def __str__(self):
         return self.definition

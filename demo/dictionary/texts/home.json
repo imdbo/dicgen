@@ -1,34 +1,36 @@
 {
-    "section_1" : {
-        "title": "Automatic dictionary generation",
-        "info": "This website is the result of our first attempt at creating a dictionary without human intervetion. This is a prototype. We have combined some of the most common NLP techniques to create a dictionary",
-        "card_1": {
-            "card_title": "TextRank-based summarization",
-            "card_content": "we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..."
+    "en": {
+        "section_1": {
+            "title": "Automatic dictionary generation",
+            "info": "This website is the result of our first attempt at generating a dictionary. This is a prototype. We have combined some of the most common NLP techniques to create a dictionary",
+            "card_1": {
+                "card_title": "TextRank-based summarization",
+                "card_content": "we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..we implemented the algo..."
+            },
+            "card_2": {
+                "card_title": "TextRank-based summarization",
+                "card_content": "we implemented the algo..."
+            },
+            "card_3": {
+                "card_title": "TextRank-based summarization",
+                "card_content": "we implemented the algo..."
+            }
         },
-        "card_2": {
-            "card_title": "TextRank-based summarization",
-            "card_content": "we implemented the algo..."
-        },
-        "card_3": {
-            "card_title": "TextRank-based summarization",
-            "card_content": "we implemented the algo..."
-        }
-    },
-    "section_2" : {
-        "title": "Different seach modes",
-        "info": "The way we access information in a dictionary is very important. We want to go beyond the standard search bar and allow the user to have more control over waht they want to find. For this reason, we have implemented different ways to search for a lemma in our dictionary.",
-        "card_1": {
-            "card_title": "TextRank-based summarization",
-            "card_content": "we implemented the algo..."
-        },
-        "card_2": {
-            "card_title": "TextRank-based summarization",
-            "card_content": "we implemented the algo..."
-        },
-        "card_3": {
-            "card_title": "TextRank-based summarization",
-            "card_content": "we implemented the algo..."
+        "section_2": {
+            "title": "Different seach modes",
+            "info": "The way we access information in a dictionary is very important. We want to go beyond the standard search bar and allow the user to have more control over waht they want to find. For this reason, we have implemented different ways to search for a lemma in our dictionary.",
+            "card_1": {
+                "card_title": "TextRank-based summarization",
+                "card_content": "we implemented the algo..."
+            },
+            "card_2": {
+                "card_title": "TextRank-based summarization",
+                "card_content": "we implemented the algo..."
+            },
+            "card_3": {
+                "card_title": "TextRank-based summarization",
+                "card_content": "we implemented the algo..."
+            }
         }
     }
 }

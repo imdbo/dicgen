@@ -33,11 +33,12 @@ class Vectors():
         vector based defition construction class.
         Method 4
     """
-    def __init__(self, Vocabulary, w2v):
+    def __init__(self, Vocabulary, w2v, pagerank_damping= 0.85):
         self.w2v = w2v
         self.word_index = Vocabulary.word_index
         self.lemma_map = Vocabulary.lemma_map
         self.lemma_inflection = Vocabulary.lemma_inflection
+        self.pagerank_damping = pagerank_damping
 
     def top_n_lemma(self, lemma:str, n: int):
         """we take the most negative and most positive words from each vector 
@@ -69,6 +70,7 @@ class Summary():
         self.word_index = Vocabulary.word_index
         self.lemma_map = Vocabulary.lemma_map
         self.bert_results = {}
+        self.cosine_similarity = Vocabulary.cosine_similarity
         
     @staticmethod
     def bert_summary(bert_model, vocabulary):
@@ -97,15 +99,14 @@ class Summary():
 
         return results
 
-    def cosine_similarity(self, x, y):
-        if len(x) > 0 and len(y) > 0:
-            dot = np.dot(x, y)
-            #euclidian normalization
-            norm_x = np.linalg.norm(x)
-            norm_y = np.linalg.norm(y)
-            return dot / (norm_x * norm_y)
-        else:
-            return 0.
+
+    def pagerank(self, matrix):
+        pr = np.ones(len(matrix), dtype=np.int32) # initialization for a, b, e, f is 1
+        d = 0.85
+        for iter in range(10):
+            pr = 0.15 + 0.85 * np.dot(matrix, pr)
+            print(iter)
+            print(pr)
 
     def calculate_similarity(self, matrix):
         '''
@@ -206,7 +207,7 @@ for lemma, data in map_import.items():
             lemma = lemma, 
             )
         le[0].definition.add(new_def) 
-
+        print(le)
 #vector lemmas after all imported
 
 for lemma, data in map_import.items():

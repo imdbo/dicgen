@@ -1,26 +1,30 @@
+'''from gensim.models import KeyedVectors
+from gensim.test.utils import datapath
 
-'''#https://www.geeksforgeeks.org/get-synonymsantonyms-nltk-wordnet-python/
 
-#https://www.programcreek.com/python/example/91604/nltk.corpus.wordnet.synsets
+w2v = KeyedVectors.load_word2vec_format('ententen13_tt2_1.vec',  unicode_errors='ignore', binary=False, limit=500000)  
 
-#https://spacy.io/universe/project/pyInflectw
-import spacy
-import lemminflect
-
-nlp = spacy.load('en_core_web_sm')
-doc = nlp('I am testing this example.')
-doc[2]._.lemma()  
-for w in doc:       # 'test'
-    print(w._.inflect('NNS'))  # 'examples'
+w2v.similar_by_word("rose")
+w2v.doesnt_match("rose tree flower plane".split())
+w2v.most_similar(positive=['rose', 'flower'], negative=['tree'])
 '''
+import spacy
+import pytextrank
 
-from nltk.corpus import wordnet as wn
+def textrank():
+    #tomar sentences do exemplo no tfm e provar se da 2.273381294964029‬
 
-synonyms=[]
-for word in wn.words():
-    print (word,end=":")
-    for syn in wn.synsets(word):
-      for l in syn.lemmas():
-        synonyms.append(l.name())
-    print(set(synonyms),end="\n")
-    synonyms.clear()
+    text = "Dogs are good to people. People like dogs. Cats are evil".lower()
+    nlp = spacy.load("en_core_web_sm")
+    tr = pytextrank.TextRank()
+    nlp.add_pipe(tr.PipelineComponent, name="textrank", last=True)
+    doc = nlp(text)
+    # examine the top-ranked phrases in the document
+    results = []
+    for p in doc._.phrases:
+        print("{:.4f} {:5d}  {}".format(p.rank, p.count, p.text))
+        print(p.chunks)
+        results.append(p.chunks)
+    return  results
+
+print(textrank())

@@ -25,7 +25,7 @@ class Vocabulary():
     """
     def __init__(self,
                 encoding: str = 'utf-8', 
-                max_lemmas: int = 30000, 
+                max_lemmas: int = 300, 
                 size_sentence: int = 15, 
                 size_short_article:int = 350,
                 top_n_sentences_lemma: int = 10, 
@@ -45,7 +45,7 @@ class Vocabulary():
         #--data--#
         self.data_df = data_df
         self.stop_words = set(stopwords.words('english'))
-
+        self.collocations = {} 
     
     def inflect(self, lemma, article):
         '''
@@ -73,10 +73,29 @@ class Vocabulary():
         #https://pypi.org/project/inflect/0.2.4/
         return inflection
 
-    def most_common_construction(self):
+    def cosine_similarity(self, x, y):
+        if len(x) > 0 and len(y) > 0:
+            dot = np.dot(x, y)
+            #euclidian normalization
+            norm_x = np.linalg.norm(x)
+            norm_y = np.linalg.norm(y)
+            return dot / (norm_x * norm_y)
+        else:
+            return 0.
+            
+    def most_common_construction(self, lemma, full_article):
         '''
             return the most common construction. Easy way to retrieve collocations
         '''
+
+        in_progress = {k : [] for k in self.lemma_map}
+        full_article = full_article.split('.')
+        for sentence in full_article:
+            for t in sentence.split():
+                if t in self.lemma_map:
+                    self.collocations[t].append(sentence)  
+        self.collocations = in_progress
+
         colocalltions = []
         # TODO: Process every article. return most common sentences that include the lemma, as an example.
         return colocalltions
@@ -87,7 +106,7 @@ class Vocabulary():
         '''
         lemmas = list(w2v.vocab)
         for lemma in lemmas:
-            if len(self.lemma_index) < self.max_lemmas:
+            if len(self.lemma_index) < self.max_lemmas and isnumeric(lemma) == False:
                     if lemma not in self.stop_words:
                         self.lemma_count += 1
                         self.lemma_index[lemma] = self.lemma_count
@@ -97,7 +116,7 @@ class Vocabulary():
 
     def build(self):
         words_only = re.compile(r'\w+')
-        full_df = pd.read_csv(self.data_df, low_memory=False, chunksize=300000)
+        full_df = pd.read_csv(self.data_df, low_memory=False, nrows=300000)
         for df in full_df:
             headwords = df['headword'].to_numpy()
             full_articles = df['long_entry'].to_numpy()
