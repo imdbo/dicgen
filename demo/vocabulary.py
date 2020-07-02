@@ -96,9 +96,16 @@ class Vocabulary():
                     self.collocations[t].append(sentence)  
         self.collocations = in_progress
 
-        colocalltions = []
-        # TODO: Process every article. return most common sentences that include the lemma, as an example.
-        return colocalltions
+    @staticmethod
+    def sanitize_text(text):
+        split = text.split()
+        to_remove = []
+        for i in range(len(split)):
+            if split[i+1] and split[i] == split[i+1]:
+                to_remove.append(i)
+        split =[split[i] for i in range(len(split)) if i not in to_remove]
+        split[0] = split[0].title()
+        return split.join()
 
     def _n_frequent_words(self, w2v:object, binary: bool = True, number_lemmas:int = 1000):
         '''
@@ -136,7 +143,6 @@ class Vocabulary():
                     cut_entry = []
 
                     l_entry = l_entry.replace('\n', ' ')
-                    l_entry = l_entry[:self.size_short_article]
                     l_entry = l_entry.split('.')
 
                     for sentence in l_entry:
@@ -156,12 +162,6 @@ class Vocabulary():
                     self.lemma_map[hw].append(l_entry)
                     if hw not in self.lemma_inflection:
                         self.lemma_inflection[hw] = self.inflect(hw, full_articles[i])
-                '''
-                for article in self.lemma_map['A']:
-                    for l in article:
-                        print(l)
-                        print('------------')
-                '''
 
     @staticmethod
     def reverse_index(word_index) -> dict: return word_index.__class__(map(reversed, word_index.items()))

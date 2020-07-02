@@ -71,7 +71,7 @@ class Summary():
         self.lemma_map = Vocabulary.lemma_map
         self.bert_results = {}
         self.cosine_similarity = Vocabulary.cosine_similarity
-        
+        self.sanitaze_text = Vocabulary.sanitize_text
     @staticmethod
     def bert_summary(bert_model, vocabulary):
         bert_summary = {}
@@ -95,7 +95,7 @@ class Summary():
                     results[lemma] = {}
                     results[lemma]['definitions'] = ['.'.join([article[k] for k in ranked_text])]
                 else:
-                    results[lemma]['definitions'].append('.'.join([article[k] for k in ranked_text]))
+                    results[lemma]['definitions'].append('.'.join([self.sanitize_text(article[k]) for k in ranked_text]))
 
         return results
 
