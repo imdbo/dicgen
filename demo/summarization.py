@@ -71,7 +71,11 @@ class Summary():
         self.lemma_map = Vocabulary.lemma_map
         self.bert_results = {}
         self.cosine_similarity = Vocabulary.cosine_similarity
-        self.sanitaze_text = Vocabulary.sanitize_text
+        self.sanitize_text = Vocabulary.sanitize_text
+        self.cosine_similarity = Vocabulary.cosine_similarity
+        self.sentences_to_matrix = Vocabulary.sentences_to_matrix
+        self.calculate_similarity = Vocabulary.calculate_similarity
+        
     @staticmethod
     def bert_summary(bert_model, vocabulary):
         bert_summary = {}
@@ -95,123 +99,64 @@ class Summary():
                     results[lemma] = {}
                     results[lemma]['definitions'] = ['.'.join([article[k] for k in ranked_text])]
                 else:
-                    results[lemma]['definitions'].append('.'.join([self.sanitize_text(article[k]) for k in ranked_text]))
+                    results[lemma]['definitions'].append('.'.join([article[k] for k in ranked_text]))
 
         return results
 
 
-    def pagerank(self, matrix):
-        pr = np.ones(len(matrix), dtype=np.int32) # initialization for a, b, e, f is 1
-        d = 0.85
-        for iter in range(10):
-            pr = 0.15 + 0.85 * np.dot(matrix, pr)
-            print(iter)
-            print(pr)
+if __name__ == '__main__':  
 
-    def calculate_similarity(self, matrix):
-        '''
-            generate similarity matrix for all sentences in the article
-            where x is the array index and each y column represents one of the indexed sentences
-            yxxxxxxxxxxxxxxxx
-            yxxxxxxxxxxxxxxxx
-            yxxxxxxxxxxxxxxxx
-            yxxxxxxxxxxxxxxxx
-            yxxxxxxxxxxxxxxxx
-            yxxxxxxxxxxxxxxxx
-        '''
-        # TODO: fix here
-        import time
-        similarity_matrix = np.zeros((len(matrix), len(matrix)),dtype=np.float32)
-        for i in range(len(matrix)):
-            array = matrix[i]
-            for j in range(len(matrix)):
-                _array = matrix[j]
-                similarity = self.cosine_similarity(array, _array)
-                #print(f'similarity {similarity}')
-                similarity_matrix[i][j] = similarity
-        sort = {x: sum(similarity_matrix[x])/len(similarity_matrix[x]) for x in range(len(similarity_matrix))}
-        results = {k: v for k, v in sorted(sort.items(), key=lambda item: item[1], reverse=True)}
-        sorted_results = []
-        for k in list(results.keys())[:3]:
-            #sorted_results[k] = similarity_matrix[k]
-            sorted_results.append(k)
-        #we return sentences sorted by highest score
-        return sorted(sorted_results)
+    number_lemmas = 3000
+    w2v = KeyedVectors.load_word2vec_format('ententen13_tt2_1.vec.1',  unicode_errors='ignore', binary=False, limit=number_lemmas)  
+    #'ententen13_tt2_1.vec.2' lowercase
 
-    def sentences_to_matrix(self, article):
-        #find longest sentence for matrix
-        split_sentences = []
-        size_sentence = 0
-        for sentence in article:
-            if len(sentence) > 1:
-                sentence = sentence.split(' ')
-                split_sentences.append(sentence)
-                sentence_len = len(sentence)
+    map_import = {} # map with the entire   
+    vocab = Vocabulary()
+    vocab._n_frequent_words(w2v=w2v, number_lemmas=number_lemmas)
+    vocab.build()
+    vector_parser = Vectors(vocab,w2v)
 
-                if sentence_len > size_sentence:
-                    size_sentence = sentence_len 
-            '''
-                create words to fit all sentences padding smaller ones
-                we pass this to calculate similarity
-            '''
-        #fit sentences to numpy matrix
-        matrix = np.zeros((len(split_sentences), size_sentence), dtype=int)
-        for i in range(len(split_sentences)):
-            sentence = split_sentences[i]
-            for j in range(len(sentence)):
-                token = sentence[j]
-                matrix[i][j] = self.word_index[token]
-        return matrix
+    map_vector_lemmas = vector_parser.to_definitions(1000)
 
-w2v = KeyedVectors.load_word2vec_format('ententen13_tt2_1.vec',  unicode_errors='ignore', binary=False, limit=500000)  
-#'ententen13_tt2_1.vec.2' lowercase
+    text_rank = Summary(vocab)
+    text_rank_summaries = text_rank.summarize_vocabulary()
 
-map_import = {} # map with the entire   
-vocab = Vocabulary()
-vocab._n_frequent_words(w2v=w2v)
-vocab.build()
-vector_parser = Vectors(vocab,w2v)
+    for lemma in map_vector_lemmas:
+        map_import[lemma] = {}
+        map_import[lemma]["vector_lemmas"] = map_vector_lemmas[lemma]
+        map_import[lemma]['definitions'] = text_rank_summaries[lemma]['definitions']
+        map_import[lemma]['inflection'] = vocab.lemma_inflection[lemma]
+        map_import[lemma]['collocations'] = vocab.collocations[lemma]
 
-map_vector_lemmas = vector_parser.to_definitions(10)
+    for lemma, data in map_import.items():
+        singular = data['inflection']
+        plural = data['inflection']
+        collocations = [Collocation.objects.get_or_create(collocation=c) for c in data['collocations']]
 
-text_rank = Summary(vocab)
-text_rank_summaries = text_rank.summarize_vocabulary()
-
-for lemma in map_vector_lemmas:
-    map_import[lemma] = {}
-    map_import[lemma]["vector_lemmas"] = map_vector_lemmas[lemma]
-    map_import[lemma]['definitions'] = text_rank_summaries[lemma]['definitions']
-    map_import[lemma]['inflection'] = vocab.lemma_inflection[lemma]
-    map_import[lemma]['collocations'] = ['test', 'test']
-
-for lemma, data in map_import.items():
-    singular = data['inflection']
-    plural = data['inflection']
-    collocations = [Collocation.objects.get_or_create(collocation=c) for c in data['collocations']]
-
-    for d in data['definitions']:
-        new_def = Definition.objects.get_or_create(
-            definition = d,
-            singular = singular,
-            plural = plural,
-        )
-        #new_def.collocations.add(Lemma.objects.get(collocation=c) for callable in collocations)
-        print(new_def)
-        print('----')
-        new_def = new_def[0]
-        print(new_def.id)
-
-        #Places.objects.get(name='kansas')
-        #print place.id
-        le = Lemma.objects.get_or_create(
-            lemma = lemma, 
+        for d in data['definitions']:
+            new_def = Definition.objects.get_or_create(
+                definition = d,
+                singular = singular,
+                plural = plural,
             )
-        le[0].definition.add(new_def) 
-        print(le)
-#vector lemmas after all imported
+            #new_def.collocations.add(Lemma.objects.get(collocation=c) for callable in collocations)
+            print(new_def)
+            print('----')
+            new_def = new_def[0]
+            print(new_def.id)
+            for c in collocations:
+                new_def.collocations.add(c)
+            #Places.objects.get(name='kansas')
+            #print place.id
+            le = Lemma.objects.get_or_create(
+                lemma = lemma, 
+                )
+            le[0].definition.add(new_def) 
+            print(le)
+    #vector lemmas after all imported
 
-for lemma, data in map_import.items():
-    vector_lemmas = [l for l in data['vector_lemmas'] if l in map_import]
-    if vector_lemmas:
-        lemma = Lemma.objects.get(lemma=lemma)
-        lemma.vector_lemmas.add(Lemma.objects.get(lemma=l) for l in vector_lemmas)
+    for lemma, data in map_import.items():
+        vector_lemmas = [l for l in data['vector_lemmas'] if l in map_import]
+        if vector_lemmas:
+            lemma = Lemma.objects.get(lemma=lemma)
+            lemma.vector_lemmas.add(Lemma.objects.get(lemma=l) for l in vector_lemmas)

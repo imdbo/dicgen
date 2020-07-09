@@ -1,4 +1,4 @@
-{% include 'dictionary/index.html' %}
+{% include 'dictionary/header.html' %}
 
 {% block results %}
 <div class="container ">
@@ -26,14 +26,15 @@
                     <div class="row">
                         <h5 class="mr-3">{{texts.collocations}}</h5>
                         {% for c in definition.collocations.all %}
-                            <p>{{ c.collocation }}</p>
+                            <p>{{ c }}</p>
                         {% endfor %}
                     </div>
                     <div class="row">
-                        <h5>{{texts.related}}</h5>
-                        <h5>{{texts.word2vec}}</h5>
+                        <h5 class="mr-3">{{texts.related}}</h5>
                     </div>
-
+                    <div class="row">
+                        <h5 class="mr-3">{{texts.word2vec}}</h5>
+                    </div>
                     <hr>
             {% endfor %}
             </div>

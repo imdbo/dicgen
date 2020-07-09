@@ -21,6 +21,8 @@ def home(request):
     print(texts)
     return render(request, 'dictionary/home.html', texts[LANGUAGE])
 
+def return_alphabeticallysorted(queried_lemma):
+    return
 
 def search_lemma(request):
     if request.method == 'GET': # If the form is submitted
