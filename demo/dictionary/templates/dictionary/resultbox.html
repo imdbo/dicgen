@@ -1,46 +1,94 @@
 {% include 'dictionary/header.html' %}
-
+{% load split %}
+{% load replace %}
+{% load declare %}
 {% block results %}
+
+{% declare "to_search" as to_search %}
 <div class="container ">
-    <div class="row">
-        <div class="col-lg mx-auto ">
-        {% for r in results %}
+    {% include 'modules/alphabetical_list.html' %}
+    <div class="col-lg mx-auto ">
         <div class="row">
-            <div class="col-lg">
-                <div class="row">
-                    <h1>{{ r }}</h1>
-                </div>
-                {% for definition in r.definition.all %}
+            {% for r in results %}
+            <div class="row">
+                <div class="col-lg">
                     <div class="row">
-                        <h5 class="mr-3">{{texts.definition}}</h5>
-                        <div class="row text-left pr-5 pl-5">   
-                            <p class="mr-5">{{ definition.definition }}</p>
+                        <h1>{{ r }}</h1>
+                    </div>
+                    {% for definition in r.definition.all %}
+                    <div class="row">
+                        <h5 class="mr-3">{{texts.singular}}</h5><i>{{ definition.singular }}&nbsp;&nbsp;&nbsp;</i>
+                        <h5 class="mr-3">{{texts.plural}}</h5><i>{{ definition.plural }}</i>
+                    </div>
+                    <div class="row">
+                        <h4 class="mr-3">{{texts.definition}}</h4>
+                        <div class="row text-left pr-5 pl-5">
+                            {% with to_search=definition.definition %}
+                            {% for w in to_search|split:" " %}
+                            {% if w.lower in all_lemas %}
+                            <span class="highlighted_lemma"><a
+                                    href="/search_lemma/?search_box={{w}}">{{w}}</a>&nbsp;</span>
+                            {% else %}
+                            <span> {{w}}&nbsp;</span>
+                            {% endif %}
+                            {% endfor %}
+                            {% endwith %}
                         </div>
                     </div>
                     <div class="row">
-                        <h5 class="mr-3">{{texts.singular}}</h5><p>{{ definition.singular }}</p>
-                    </div>
-                    <div class="row ">
-                        <h5 class="mr-3">{{texts.plural}}</h5><p>{{ definition.plural }}</p>
-                    </div>
-                    <div class="row">
-                        <h5 class="mr-3">{{texts.collocations}}</h5>
-                        {% for c in definition.collocations.all %}
-                            <p>{{ c }}</p>
-                        {% endfor %}
-                    </div>
-                    <div class="row">
-                        <h5 class="mr-3">{{texts.related}}</h5>
-                    </div>
-                    <div class="row">
-                        <h5 class="mr-3">{{texts.word2vec}}</h5>
+                        <div class="col-lg">
+                            <h5>{{texts.collocations}}</h5>
+                            <div class="row text-left pr-5 pl-5">
+                                <ul>
+                                    {% for c in r.collocations.all %}
+                                    <li>{% for w in c.collocation|split:" " %}
+                                        {% if w.lower in all_lemas %}
+                                        <span class="highlighted_lemma"><a
+                                                href="/search_lemma/?search_box={{w}}">{{w}}</a>&nbsp;</span>
+                                        {% else %}
+                                        <span> {{w}}&nbsp;</span>
+                                        {% endif %}
+                                        {% endfor %}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <hr>
-            {% endfor %}
+                    {% endfor %}
+                    <div class="row">
+                        <div class="col-lg">
+                            <h5 class="mr-3">{{texts.related}}</h5>
+                            <div class="row text-left pr-5 pl-5">
+                                <ul>
+                                    {% for lemma in r.positive_lemma.all %}
+                                    <li> {% if lemma.lower in all_lemas %}
+                                        <span class="highlighted_lemma"><a
+                                                href="/search_lemma/?search_box={{w}}">{{lemma}}</a>&nbsp;</span>
+                                        {% else %}
+                                        <span> {{lemma}}&nbsp;</span>
+                                        {% endif %}
+                                        {% endfor %}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
         </div>
     </div>
 </div>
 {% endblock %}
+
+<script>
+    function highlight(id) {
+        console.log(id);
+    }
+</script>
+
+<style>
+    .highlighted_lemma {
+        color: red
+    }
+</style>

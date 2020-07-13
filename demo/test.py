@@ -1,30 +1,30 @@
-'''from gensim.models import KeyedVectors
-from gensim.test.utils import datapath
+
+from gensim.models import KeyedVectors
+number_max_lemmas = 5000
+import sys
+w2v = KeyedVectors.load_word2vec_format('ententen13_tt2_1.vec.1',  unicode_errors='ignore', binary=False, limit=number_max_lemmas)  
+
+def top_n_lemmas(lemma:str, n: int, negative=False):
+    """we take the most negative and most positive words from each vector 
+        and construct a description around it
+    """
+    try:
+        if negative == False:
+            return  list(w2v.most_similar(lemma, topn=sys.maxsize))[:n]
+        else:
+            all_sims = w2v.most_similar(lemma, topn=sys.maxsize)
+            last_n = list(reversed(all_sims[-n:]))
+            return last_n
+    except:
+        return []
 
 
-w2v = KeyedVectors.load_word2vec_format('ententen13_tt2_1.vec',  unicode_errors='ignore', binary=False, limit=500000)  
-
-w2v.similar_by_word("rose")
-w2v.doesnt_match("rose tree flower plane".split())
-w2v.most_similar(positive=['rose', 'flower'], negative=['tree'])
-'''
-import spacy
-import pytextrank
-
-def textrank():
-    #tomar sentences do exemplo no tfm e provar se da 2.273381294964029‬
-
-    text = "Dogs are good to people. People like dogs. Cats are evil".lower()
-    nlp = spacy.load("en_core_web_sm")
-    tr = pytextrank.TextRank()
-    nlp.add_pipe(tr.PipelineComponent, name="textrank", last=True)
-    doc = nlp(text)
-    # examine the top-ranked phrases in the document
-    results = []
-    for p in doc._.phrases:
-        print("{:.4f} {:5d}  {}".format(p.rank, p.count, p.text))
-        print(p.chunks)
-        results.append(p.chunks)
-    return  results
-
-print(textrank())
+x = ['Alien', 'dog']
+for lemma in x:
+    lemma = lemma.lower()
+    xyz = [l for l in top_n_lemmas(lemma, n=5, negative=False)]
+    negative_n_lemmas = [l for l in top_n_lemmas(lemma, n=5, negative=True)]
+    print(xyz)
+    for m in xyz:
+        print(m[0])
+    print(negative_n_lemmas)

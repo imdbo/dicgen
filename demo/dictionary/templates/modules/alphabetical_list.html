@@ -1,0 +1,27 @@
+<div id="alphabetical_box" class="row">
+    <div id="lemma" class="col-md-6 text-center mx-auto">
+        <ul class="list-group list-group-flush">
+            {% for w in alphabetical_search.before %}
+                <li class="inline list-group-item"><a href="/search_lemma/?search_box={{w}}">{{w}}</a>&nbsp;</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div id="after-lemma" class="col-md-6  text-center mx-auto">
+        <ul class="list-group list-group-flush">
+            {% if alphabetical_search.found %}
+                <li class="highlighted_lemma list-group-item active">{{alphabetical_search.queried}}</li>
+            {% endif %}
+            {% for w in alphabetical_search.after %}
+                <li class=" inline list-group-item">
+                <a href="/search_lemma/?search_box={{w}}">{{w}}</a>&nbsp;</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<style>
+    #alphabetical_box {
+        max-height: 15rem;
+        overflow-y: scroll;
+    }
+</style>

@@ -2,7 +2,7 @@ import spacy
 import os
 import gensim
 import numpy as np
-from vocabulary import Vocabulary
+from vocabulary_multi import Vocabulary
 from gensim.models import KeyedVectors
 from gensim.test.utils import datapath
 from tqdm import tqdm
@@ -12,61 +12,16 @@ import numpy
 numpy.set_printoptions(threshold=sys.maxsize)
 from django.conf import settings
 import django
-
 from demo.settings import DATABASES, INSTALLED_APPS
 settings.configure(DATABASES=DATABASES, INSTALLED_APPS=INSTALLED_APPS)
 django.setup()
 from dictionary.models import *
 
-#https://github.com/dmmiller612/bert-extractive-summarizer
 
-"""
-    different techniques
-    all models included must be pre-trained. Training our own models is out of reach.
-    1- textrank text summarization from wikipedia's article.
-    x- bert-based summarization of wikipedia's article. // Not really relevant
-    4- w2v based. We construct the definition by means of cosine distance and attending to the unique words in the embedding when compared to the closest lemma(case-sensitive lemma-based w2v model)
-    an ontology is needed? NLTK's wordnet?
-"""
-class Vectors():
-    """
-        vector based defition construction class.
-        Method 4
-    """
-    def __init__(self, Vocabulary, w2v, pagerank_damping= 0.85):
-        self.w2v = w2v
-        self.word_index = Vocabulary.word_index
-        self.lemma_map = Vocabulary.lemma_map
-        self.lemma_inflection = Vocabulary.lemma_inflection
-        self.pagerank_damping = pagerank_damping
-
-    def top_n_lemma(self, lemma:str, n: int):
-        """we take the most negative and most positive words from each vector 
-            and construct a description around it
-        """
-        return  self.w2v.similar_by_word(lemma, topn=n)
-
-    def _load_ontoloy(self):
-        # TODO: find some ontology (WordNet) to Improve definitions and include synonymity
-        return
- 
-    def ont_category(self, lemma: str):
-        return 
- 
-    def to_definitions(self, n:int):
-        '''
-            for now we take the top n closest lemmas in the vector of the lemma and add return them
-            the main definition comes from a summary of wikipedia's article on the lemma.
-        '''
-        map_top_n = {}
-        for lemma in self.lemma_map:
-            if lemma not in map_top_n:
-                map_top_n[lemma] = self.top_n_lemma(lemma,n)
-        return map_top_n
-
+'''
 class Summary():
+    #https://github.com/dmmiller612/bert-extractive-summarizer
     def __init__(self, Vocabulary):
-        #https://iq.opengenus.org/textrank-for-text-summarization/
         self.word_index = Vocabulary.word_index
         self.lemma_map = Vocabulary.lemma_map
         self.bert_results = {}
@@ -86,77 +41,108 @@ class Summary():
                 bert_summary['lemma'] = lemma
                 bert_summary['definitions'] = [summary]
 
-    def summarize_vocabulary(self):
-        results = {}
-        keys = list(self.lemma_map.keys())
-
-        for l in tqdm(range(len(keys))):
-            lemma = keys[l]
-            for article in self.lemma_map[lemma]:
-                ranked_text = self.calculate_similarity(self.sentences_to_matrix(article))
-                print(ranked_text)
-                if lemma not in results:
-                    results[lemma] = {}
-                    results[lemma]['definitions'] = ['.'.join([article[k] for k in ranked_text])]
-                else:
-                    results[lemma]['definitions'].append('.'.join([article[k] for k in ranked_text]))
-
-        return results
-
-
+'''
 if __name__ == '__main__':  
 
-    number_lemmas = 3000
-    w2v = KeyedVectors.load_word2vec_format('ententen13_tt2_1.vec.1',  unicode_errors='ignore', binary=False, limit=number_lemmas)  
+    number_max_lemmas = 2500000
+    w2v = KeyedVectors.load_word2vec_format('ententen13_tt2_1.vec.1',  unicode_errors='ignore', binary=False, limit=number_max_lemmas)  
     #'ententen13_tt2_1.vec.2' lowercase
 
     map_import = {} # map with the entire   
-    vocab = Vocabulary()
-    vocab._n_frequent_words(w2v=w2v, number_lemmas=number_lemmas)
+    vocab = Vocabulary(w2v= w2v)
+    vocab._n_frequent_words()
     vocab.build()
-    vector_parser = Vectors(vocab,w2v)
+    #print(vocab.lemma_map)
+    #map_vector_lemmas = vector_parser.to_definitions(number_lemmas)
 
-    map_vector_lemmas = vector_parser.to_definitions(1000)
+    #vocab.global_pos_collocations()
+    ''' 
+    map_import[lemma] = {}
+    map_import[lemma]["vector_lemmas"] = lemma
+    map_import[lemma]['definitions'] = text_rank_summaries[lemma]['definitions']
+    map_import[lemma]['inflection'] = vocab.lemma_inflection[lemma]
+    map_import[lemma]['collocations'] = vocab.collocations[lemma]
 
-    text_rank = Summary(vocab)
-    text_rank_summaries = text_rank.summarize_vocabulary()
+        save stats:
+        1.number of lemmas
+        2.number of dqefinitions
+        3.number of lemmas with inflection %
+    '''
 
-    for lemma in map_vector_lemmas:
-        map_import[lemma] = {}
-        map_import[lemma]["vector_lemmas"] = map_vector_lemmas[lemma]
-        map_import[lemma]['definitions'] = text_rank_summaries[lemma]['definitions']
-        map_import[lemma]['inflection'] = vocab.lemma_inflection[lemma]
-        map_import[lemma]['collocations'] = vocab.collocations[lemma]
+    stats = { "number_lemmas": 0, "total_definitions": 0, "lemmas_inflected": 0, "disambiguations":0}
+    for lemma in vocab.lemma_map:
+        print(vocab.lemma_map[lemma])
 
-    for lemma, data in map_import.items():
-        singular = data['inflection']
-        plural = data['inflection']
+    for lemma, data in vocab.lemma_map.items():
+        stats['number_lemmas'] += 1
+        if data['inflection']:
+            singular = data['inflection'][0]
+            plural = data['inflection'][1]
+            stats["lemmas_inflected"] += 1
+
         collocations = [Collocation.objects.get_or_create(collocation=c) for c in data['collocations']]
 
-        for d in data['definitions']:
-            new_def = Definition.objects.get_or_create(
-                definition = d,
+        definitions = [Definition.objects.get_or_create(
+                definition = d['definition'],
                 singular = singular,
                 plural = plural,
-            )
-            #new_def.collocations.add(Lemma.objects.get(collocation=c) for callable in collocations)
-            print(new_def)
-            print('----')
-            new_def = new_def[0]
-            print(new_def.id)
-            for c in collocations:
-                new_def.collocations.add(c)
-            #Places.objects.get(name='kansas')
-            #print place.id
-            le = Lemma.objects.get_or_create(
-                lemma = lemma, 
-                )
-            le[0].definition.add(new_def) 
-            print(le)
-    #vector lemmas after all imported
+                local_pos_tag = d['pos_stats']) for d in data["definitions"] ]
 
-    for lemma, data in map_import.items():
-        vector_lemmas = [l for l in data['vector_lemmas'] if l in map_import]
-        if vector_lemmas:
-            lemma = Lemma.objects.get(lemma=lemma)
-            lemma.vector_lemmas.add(Lemma.objects.get(lemma=l) for l in vector_lemmas)
+        stats["total_definitions"]+= len(definitions)
+        #new_def.collocations.add(Lemma.objects.get(collocation=c) for callable in collocations)
+        print(definitions)
+        print('----')
+
+        le = Lemma.objects.get_or_create(
+            lemma = lemma
+            )
+        #Places.objects.get(name='kansas')
+        #print place.id
+        lemma_lower = le[0].lemma.lower()
+
+        top_n_lemmas = [l for l in vocab.top_n_lemmas(lemma_lower, n=5, negative=False)]
+        if top_n_lemmas:
+             for l in top_n_lemmas:
+                context_token = Context_token.objects.get_or_create(
+                    token = l[0],
+                    similarity = l[1]
+                )
+                le[0].positive_lemma.add(context_token[0].id)
+
+        negative_n_lemmas = [l for l in vocab.top_n_lemmas(lemma_lower, n=-5, negative=True)]
+        if negative_n_lemmas:
+             for l in negative_n_lemmas:
+                context_token = Context_token.objects.get_or_create(
+                    token = l[0],
+                    similarity = l[1]
+                )
+                le[0].negative_lemma.add(context_token[0].id)
+
+
+        disambiguations = [Definition.objects.get_or_create(
+            definition = d['definition'],
+            singular = singular,
+            plural = plural,
+            local_pos_tag = d['pos_stats']
+            ) for d in data["disambiguations"]]
+        stats["disambiguations"] += len(disambiguations)
+
+
+        global_pos_tags = [PoS_tag.objects.get_or_create(
+            pos = k,
+            absolute_frequency = data['pos_freq'][k]
+        ) for k in data['pos_freq']]
+        
+        for global_pos in global_pos_tags:
+            le[0].global_pos_tag.add(global_pos[0].id)
+        for c in collocations:
+            print(c[0].collocation)
+            le[0].collocations.add(c[0].id)
+        for disambiguation in disambiguations:
+            le[0].disambiguations.add(disambiguation[0].id)
+        for d in definitions:
+            le[0].definition.add(d[0].id) 
+
+        le[0].frequency_w2v = data['frequency_w2v']
+
+print(stats)

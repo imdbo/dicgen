@@ -46,12 +46,13 @@ for root, dirs, files in os.walk(folder):
                             if article_len > stats_df['longest full article']:
                                 stats_df['longest full article'] = article_len
 
-                            to_df['headword'].append(article['title'])
-                            to_df['long_entry'].append(article['text'])
+                            if len(article['title'].split()) == 1:
+                                to_df['headword'].append(article['title'])
+                                to_df['long_entry'].append(article['text'])
                         except Exception as e:
                             print(f'{e}--\n{line}')
 
-            if file_count >= 100:
+            if file_count >= 1000:
                 df_articles = pd.DataFrame.from_dict(to_df)
                 df_articles.to_csv('data.csv', mode='a+')
                 to_df = {"headword": [], "long_entry": []} #dict to parse into dataframe with pandas

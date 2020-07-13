@@ -1,5 +1,4 @@
 {% include 'dictionary/header.html' %}
-
 {% block home %}
 <div class="container-fluid ">
     <div class="row centrado50 justify-content-center">
@@ -18,29 +17,29 @@
                             <i data-feather="activity"></i>
                             <h5 class="card-title">{{section_1.card_1.card_title}}</h5>
                             <p class="card-text">{{section_1.card_1.card_content}}</p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                            <a href="https://dumps.wikimedia.org/" class="btn btn-primary">{{buttons.know_more}}</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg text-center mx-auto">
                     <div class="card  text-center" style="width: 20rem; margin:auto">
                         <div class="card-body">
-                            <i data-feather="activity"></i>
+                            <i data-feather="trending-up"></i>
                             <h5 class="card-title">{{section_1.card_2.card_title}}</h5>
                             <p class="card-text">{{section_1.card_2.card_content}}</p>
                             </p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                            <a href="https://cran.r-project.org/web/packages/textrank/vignettes/textrank.html" class="btn btn-primary">{{buttons.know_more}}</a>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg text-center mx-auto">
                     <div class="card" style="width: 20rem; margin:auto">
                         <div class="card-body">
-                            <i data-feather="activity"></i>
+                            <i data-feather="bar-chart"></i>
                             <h5 class="card-title">{{section_1.card_3.card_title}}</h5>
                             <p class="card-text">{{section_1.card_3.card_content}}</p>
                             </p>
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                            <a href="https://en.wikipedia.org/wiki/Word2vec" class="btn btn-primary">{{buttons.know_more}}</a>
                         </div>
                     </div>
                 </div>
@@ -58,19 +57,27 @@
                 </div>
             </div>
             <div class="row mt-5">
-                <div class="card centrado50 padded015" style="width: 20rem;">
+                <div class="card centrado50 " style="width: 20rem;">
                     <div class="card-body">
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <div class="row mt-5">
+                        <div class="col-3 centrado">
+                            <i class="fa fa-sort-alpha-desc big-text" aria-hidden="true"></i>
+                           </div>
+                        <div class="col-md text-center mx-auto">
+                            <p class="card-text">
+                                {{section_2.card_1.card_title}}</p>
+                        </div>
                     </div>
                 </div>
-                <div class="card centrado50 padded015" style="width: 20rem;">
+                </div>
+                <div class="card centrado50 " style="width: 20rem;">
                     <div class="card-body">
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <p class="card-text">{{section_2.card_2.card_title}}</p>
                     </div>
                 </div>
-                <div class="card centrado50 padded015" style="width: 20rem;">
+                <div class="card centrado50 " style="width: 20rem;">
                     <div class="card-body">
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <p class="card-text">{{section_2.card_3.card_title}}</p>
                     </div>
                 </div>
             </div>
@@ -85,5 +92,5 @@
 </style>
 
 <script>
-    feather.replace({ class: 'activity', 'stroke-width': 1.25, 'height': 100, 'width': 100, 'color': 'lightbue' })
+    feather.replace({ class: 'activity', 'stroke-width': 0.75, 'height': 70, 'width': 70, 'color': 'lightbue' })
 </script>
