@@ -5,6 +5,6 @@
         "plural": "Plural",
         "related": "related lemmas",
         "word2vec": "word2vec related lemmas",
-        "collocations": "collocations"
+        "collocations": "examples"
     }
 }

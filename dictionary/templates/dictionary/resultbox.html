@@ -16,12 +16,13 @@
                         <h1>{{ r }}</h1>
                     </div>
                     {% for definition in r.definition.all %}
-                    <div class="row">
+                    <div class="row mrpr-5">
+                        <h5 class="ml-3 mr-3 pos_tag"> <b>NOUN</b></h5>
                         <h5 class="mr-3">{{texts.singular}}</h5><i>{{ definition.singular }}&nbsp;&nbsp;&nbsp;</i>
                         <h5 class="mr-3">{{texts.plural}}</h5><i>{{ definition.plural }}</i>
                     </div>
                     <div class="row">
-                        <h4 class="mr-3">{{texts.definition}}</h4>
+                        <h4 class="ml-3 mr-3">{{texts.definition}}</h4>
                         <div class="row text-left pr-5 pl-5">
                             {% with to_search=definition.definition %}
                             {% for w in to_search|split:" " %}
@@ -35,7 +36,28 @@
                             {% endwith %}
                         </div>
                     </div>
+                    <hr>
+                    {% endfor %}
                     <div class="row">
+                        <div class="col-lg">
+                            <h5 class="mr-3">{{texts.related}}</h5>
+                            <div class="row text-left pr-5 pl-5">
+                                <ul>
+                                    {% for lemma in r.positive_lemma.all %}
+                                    <li style="display:inline"> {% if lemma.lower in all_lemas %}
+                                        <span class="highlighted_lemma"><a
+                                                href="/search_lemma/?search_box={{w}}">{{lemma}}</a>&nbsp;</span>
+                                        {% else %}
+                                        <span> {{lemma}}&nbsp;</span>
+                                        {% endif %}
+                                        {% endfor %}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                                <div class="row">
                         <div class="col-lg">
                             <h5>{{texts.collocations}}</h5>
                             <div class="row text-left pr-5 pl-5">
@@ -49,33 +71,14 @@
                                         <span> {{w}}&nbsp;</span>
                                         {% endif %}
                                         {% endfor %}</li>
+                                        <div>original article</div>
                                     {% endfor %}
                                 </ul>
                             </div>
                         </div>
                     </div>
-                    <hr>
-                    {% endfor %}
-                    <div class="row">
-                        <div class="col-lg">
-                            <h5 class="mr-3">{{texts.related}}</h5>
-                            <div class="row text-left pr-5 pl-5">
-                                <ul>
-                                    {% for lemma in r.positive_lemma.all %}
-                                    <li> {% if lemma.lower in all_lemas %}
-                                        <span class="highlighted_lemma"><a
-                                                href="/search_lemma/?search_box={{w}}">{{lemma}}</a>&nbsp;</span>
-                                        {% else %}
-                                        <span> {{lemma}}&nbsp;</span>
-                                        {% endif %}
-                                        {% endfor %}</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             {% endfor %}
+
         </div>
     </div>
 </div>
@@ -91,4 +94,5 @@
     .highlighted_lemma {
         color: red
     }
+    .in
 </style>

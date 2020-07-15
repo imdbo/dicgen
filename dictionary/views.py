@@ -48,11 +48,12 @@ def search_lemma(request):
         query_lemma = request.GET.get('search_box', None)
         print(f'query_lemma {query_lemma}')
         print(Lemma.objects.all())
-        results = Lemma.objects.filter(lemma__contains=query_lemma.lower())
+        results = Lemma.objects.filter(lemma__contains=query_lemma)
         context = {'results': results, 'all_lemas': ALL_LEMMAS, "alphabetical_search": list_lemmas_alphabetically(query_lemma)}
         if results:
             texts = read_text_template('dictionary/texts/resultbox.json')
             context['texts'] = texts[LANGUAGE]
+        print(context)
     return render(request, 'dictionary/resultbox.html', context)
 
 class lemma_list(viewsets.ModelViewSet):

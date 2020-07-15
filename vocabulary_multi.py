@@ -12,8 +12,8 @@ from lemminflect import getLemma, getInflection
 spacy_parser = spacy.load('en_core_web_lg')
 spacy.prefer_gpu() #enable cuda if available.
 import math
-from multiprocessing import Process
 import sys
+import nltk
 
 @dataclass
 class Vocabulary():
@@ -57,6 +57,12 @@ class Vocabulary():
         self.disambiguations = {}
         #self.ignore_if_in = ["may also refer to", "can refer to"]
 
+    def nltk_collocations(self, lemma, article):
+        for lemma, in self.lemma_map:
+            article = self.lemma_map[lemma]
+            nltkd = nltk.Text(tkn for tkn in sentence.split( ) for sentence in article.split('.'))
+            
+
     def top_n_lemmas(self, lemma:str, n: int, negative=False):
         """we take the most negative and most positive words from each vector 
             and construct a description around it
@@ -66,7 +72,7 @@ class Vocabulary():
                 return  list(self.w2v.most_similar(lemma, topn=sys.maxsize))[:n]
             else:
                 all_sims = self.w2v.most_similar(lemma, topn=sys.maxsize)
-                last_n = list(reversed(all_sims[-n:]))
+                last_n = list(reversed(all_sims))[-n:]
                 return last_n
         except:
             return []
@@ -99,7 +105,6 @@ class Vocabulary():
             self.lemma_map[lemma]['pos_freq'] = pos_freqs # global pos frequency
             #textrank collocations
             temp_collocations = self.calculate_similarity(self.sentences_to_matrix(self.collocations[lemma]), n_sentences=4)
-            print(temp_collocations)
             if lemma in self.disambiguations:
                 self.collocations[lemma] = [self.collocations[lemma][sentence] for sentence in temp_collocations if sentence not in self.lemma_map[lemma] and sentence not in self.disambiguations[lemma]]
             else:
@@ -141,7 +146,7 @@ class Vocabulary():
                 self.word_count += 1
                 self.word_index[token.text] = self.word_count
 
-            if token.text.lower() == hw.lower():
+            if token.text.lower() == hw:
                 if token.tag_ not in pos_occurrences:
                     pos_occurrences[token.pos_] = 1
                     tag_occurrences[token.tag_] = 1
@@ -193,7 +198,6 @@ class Vocabulary():
             for j in range(len(matrix)):
                 _array = matrix[j]
                 similarity = self.cosine_similarity(array, _array)
-                #print(f'similarity {similarity}')
                 similarity_matrix[i][j] = similarity
         sort = {x: sum(similarity_matrix[x])/len(similarity_matrix[x]) for x in range(len(similarity_matrix))}
         results = {k: v for k, v in sorted(sort.items(), key=lambda item: item[1], reverse=True)}
@@ -254,6 +258,8 @@ class Vocabulary():
             try:
                 if i+1 <= len(split) and split[i] == split[i+1]:
                     to_remove.append(i)
+                elif i+2 < len(split) and split[i] == split[i+2]:
+                    to_remove.append(i)
             except:
                 continue
         split =[split[i] for i in range(len(split)) if i not in to_remove]
@@ -269,10 +275,8 @@ class Vocabulary():
         for lemma in lemmas:
             lemma_count += 1
             self.lemma_index[lemma] = lemma_count
-        print(self.lemma_index)
 
     def generate_def(self, headwords, full_articles):
-        print(headwords)
         '''
         1. Find PoS tag of headword in the article
         2. Add new definition which includes
@@ -294,69 +298,66 @@ class Vocabulary():
             l_entry = full_articles[i]
             disambiguation = False
 
-            if isinstance(hw, str) and hw.lower() in self.lemma_index:
-                if re.search(self.regex_disambiguation, hw):
-                    disambiguation = True
+            if isinstance(hw, str):
+                hw =  hw.lower()
+                print(hw)
+                if hw in self.lemma_index:
+                    if re.search(self.regex_disambiguation, hw):
+                        disambiguation = True
 
-                hw_split = hw.split()
-                #if hw_split[0] in self.lemma_index:
-                size_entry = 0 
-                cut_entry = []
-                full_article = l_entry
-                l_entry = l_entry.replace('\n', ' ')
-                l_entry = l_entry.replace(',', ' ')
-                l_entry = self.sanitize_text(l_entry)
-                inflection, current_pos  = self.inflect_pos(hw, l_entry)
+                    hw_split = hw.split()
+                    #if hw_split[0] in self.lemma_index:
+                    size_entry = 0 
+                    cut_entry = []
+                    full_article = l_entry
+                    l_entry = l_entry.replace('\n', ' ')
+                    l_entry = l_entry.replace(',', ' ')
+                    l_entry = self.sanitize_text(l_entry)
+                    inflection, current_pos  = self.inflect_pos(hw, l_entry)
 
-                l_entry = l_entry.split('.')
+                    l_entry = l_entry.split('.')
 
-                for sentence in l_entry:
-                    if size_entry < self.size_short_article and "may refer to" not in sentence:
-                        size_entry += len(sentence)
-                        cut_entry.append(sentence)
+                    for sentence in l_entry:
+                        if size_entry < self.size_short_article and "may refer to" not in sentence:
+                            size_entry += len(sentence)
+                            cut_entry.append(sentence)
 
-                self.for_collocations(l_entry)
+                    self.for_collocations(l_entry)
 
-                for i in range(len(cut_entry)):
-                    sentence = re.findall(self.words_only, cut_entry[i])
-                    for word in sentence:
-                        if word not in self.word_index:
-                            self.word_count += 1
-                            self.word_index[word] = self.word_count
-                    cut_entry[i] = ' '.join(sentence)
-                #cut_entry = '.'.join(cut_entry)
-                new_entry = {"definition": '.'.join([cut_entry[k] for k in self.calculate_similarity(self.sentences_to_matrix(cut_entry))]),
-                    "pos_stats": current_pos
-                }
+                    for i in range(len(cut_entry)):
+                        sentence = re.findall(self.words_only, cut_entry[i])
+                        for word in sentence:
+                            if word not in self.word_index:
+                                self.word_count += 1
+                                self.word_index[word] = self.word_count
+                        cut_entry[i] = ' '.join(sentence)
+                    #cut_entry = '.'.join(cut_entry)
+                    new_entry = {"definition": '.'.join([cut_entry[k] for k in self.calculate_similarity(self.sentences_to_matrix(cut_entry))]),
+                        "pos_stats": current_pos
+                    }
 
-                if disambiguation == False:
-                    if "definitions" in self.lemma_map[hw]:
-                        self.lemma_map[hw]["definitions"].append(new_entry)
+                    if disambiguation == False:
+                        if "definitions" in self.lemma_map[hw]:
+                            self.lemma_map[hw]["definitions"].append(new_entry)
+                        else:
+                            self.lemma_map[hw]["definitions"] = [new_entry]
                     else:
-                        self.lemma_map[hw]["definitions"] = [new_entry]
-                else:
-                    if "definitions" not in  self.lemma_map[hw]["disambiguations"]:
-                        self.disambiguations[hw]["disambiguations"]["definitions"] = new_entry
-                    else:
-                        self.disambiguations[hw]["disambiguations"]["definitions"].append(new_entry)
-                if 'inflection' not in self.lemma_map[hw]:
-                    self.lemma_map[hw]['inflection'] = inflection
+                        if "definitions" not in  self.lemma_map[hw]["disambiguations"]:
+                            self.disambiguations[hw]["disambiguations"]["definitions"] = new_entry
+                        else:
+                            self.disambiguations[hw]["disambiguations"]["definitions"].append(new_entry)
+                    if 'inflection' not in self.lemma_map[hw]:
+                        self.lemma_map[hw]['inflection'] = inflection
 
-    def build(self, cores:int= 3, chunksize:int=10000):
+    def build(self, df):
         '''
         1. read buffer of csv with pandas
-        2. TODO split into processes to speed up
         3. send to generate_def
         4. after parsing whole dataframe. Find collocations
         5. retrieve close lemmas from word2vec model
         '''
-        full_df = pd.read_csv(self.data_df, low_memory=False, nrows=chunksize)
         #for df in full_df:
-        print(df)
-        headwords = list(df['headword'])
-        full_articles = list(df['long_entry'])
-        #for df in full_df:
-        self.generate_def(headwords=headwords, full_articles=full_articles)
+        self.generate_def(headwords=df[0], full_articles=df[1])
         '''
         call collocation generation and pos tagging for all the dataframe parsed
         '''
@@ -364,7 +365,3 @@ class Vocabulary():
 
     @staticmethod
     def reverse_index(word_index) -> dict: return word_index.__class__(map(reversed, word_index.items()))
-
-if __name__ == "__main__":
-    tryxs = Vocabulary()
-    tryxs.build()
