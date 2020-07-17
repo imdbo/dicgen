@@ -15,9 +15,9 @@ django.setup()
 import math
 from dictionary.models import *
 from multiprocessing import Process
-
-number_max_lemmas = 100000
-chunksize = 10000
+import time 
+number_max_lemmas = 30000
+chunksize = 100000
 cores = 3
 if __name__ == '__main__':  
     w2v = KeyedVectors.load_word2vec_format('ententen13_tt2_1.vec.1',  unicode_errors='ignore', binary=False, limit=number_max_lemmas)  
@@ -27,15 +27,14 @@ if __name__ == '__main__':
     imported = []
 
     stats = { "number_lemmas": 0, "total_definitions": 0, "lemmas_inflected": 0, "disambiguations":0}
-    for df in pd.read_csv('data.csv', low_memory=False, skiprows=range(1,100000), chunksize=chunksize):
+    for df in pd.read_csv('data.csv', low_memory=False, chunksize=chunksize):
 
-
+        headwords = np.array(df['headword'])
+        long_entries= np.array(df['long_entry'])
+        vocab.generate_def(headwords, long_entries)
+        '''
         chunkedchunk = math.floor(chunksize/cores)
         first_new_row = 0 
-        headwords = list(df['headword'])
-        full_articles = list(df['long_entry'])
-        vocab.build([headwords, full_articles])
-        '''
         split_df = []
         to_pass = 0
         
@@ -57,8 +56,6 @@ if __name__ == '__main__':
                     plural = data['inflection'][1]
                     stats["lemmas_inflected"] += 1
 
-                collocations = [Collocation.objects.get_or_create(collocation=c) for c in data['collocations']]
-
                 definitions = [Definition.objects.get_or_create(
                         definition = d['definition'],
                         singular = singular,
@@ -67,7 +64,7 @@ if __name__ == '__main__':
 
                 stats["total_definitions"]+= len(definitions)
                 #new_def.collocations.add(Lemma.objects.get(collocation=c) for callable in collocations)
-                print(definitions)
+                print(lemma)
                 print('----')
 
                 le = Lemma.objects.get_or_create(
@@ -104,17 +101,6 @@ if __name__ == '__main__':
                     ) for d in data["disambiguations"]]
                 stats["disambiguations"] += len(disambiguations)
 
-
-                global_pos_tags = [PoS_tag.objects.get_or_create(
-                    pos = k,
-                    absolute_frequency = data['pos_freq'][k]
-                ) for k in data['pos_freq']]
-                
-                for global_pos in global_pos_tags:
-                    le[0].global_pos_tag.add(global_pos[0].id)
-                for c in collocations:
-                    print(c[0].collocation)
-                    le[0].collocations.add(c[0].id)
                 for disambiguation in disambiguations:
                     le[0].disambiguations.add(disambiguation[0].id)
                 for d in definitions:
@@ -122,4 +108,31 @@ if __name__ == '__main__':
 
                 le[0].frequency_w2v = data['frequency_w2v']
 
-        print(stats)
+    vocab.global_pos_collocations()
+    for lemma, data in vocab.lemma_map.items():
+        global_pos_tags = []
+        le = Lemma.objects.get_or_create(lemma = lemma)
+
+        for k in data['pos_freq']:
+            global_pos_tag = PoS_tag.objects.get_or_create (
+            pos = k)
+            print(global_pos_tag[0].pos)
+            global_pos_tags.append(global_pos_tag)
+        
+        pos_freqs = []
+        for k in data['pos_freq']:
+            k = PoS_tag.objects.get(pos=k)
+            pos_freqs.append(Pos_frequency.objects.get_or_create (
+            pos = k,
+            absolute_frequency = data['pos_freq'][k.pos]))
+
+
+        for tag in pos_freqs:
+            le[0].global_pos_tag.add(tag[0].id)
+
+        collocations = [Collocation.objects.get_or_create(collocation=c) for c in data['collocations']]
+
+        for c in collocations:
+            print(c[0].collocation)
+            le[0].collocations.add(c[0].id)
+            print(stats)

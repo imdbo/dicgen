@@ -8,9 +8,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://unpkg.com/lunr/lunr.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
     <meta charset="utf-8">
+    {% include 'modules/alphabetical_list.html' %}
 </head>
 
 <style>
@@ -38,6 +39,7 @@
     }
     .centrado50 {
         width: 50%;
+        max-width: 50%;
         margin: auto;
     }
     .top-bottom-padding {
@@ -58,3 +60,23 @@
 }
 
 </style>
+
+<script>
+    let state = {
+        "alphabeticalList": false,
+        "currentLemma": '',
+        "lemmas": {}
+    };
+
+    const showDiv = (id) => {
+        if (state[id] === false) {
+            document.getElementById(id).style.visibility  = 'visible'
+        } else {
+            document.getElementById(id).style.visibility  = 'hidden'
+        }
+        state[id] = !state[id]
+    }; 
+    const highlightCurrentLemma = (lemma) => {
+        document.getElementById(id)
+    }
+</script>

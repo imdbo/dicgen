@@ -2,19 +2,16 @@ from django.db import models
 
 # Create your models here.
 
-'''
-    lemma
-    gender
-    number
-    pronunciation
-    definition
-    collocations / most frequents constructions
-'''
 class PoS_tag(models.Model):
-    pos = models.CharField(max_length=20)
-    absolute_frequency = models.IntegerField()
+    pos = models.CharField(max_length=20, unique=True)
     def __str__(self):
         return self.pos
+
+class Pos_frequency(models.Model):
+    pos = models.ForeignKey(PoS_tag, on_delete=models.CASCADE)
+    absolute_frequency = models.IntegerField()
+    def __str__(self):
+        return self.pos.pos
 
 class Collocation(models.Model):
     collocation = models.CharField(max_length=200)
@@ -41,7 +38,7 @@ class Lemma (models.Model):
     definition = models.ManyToManyField(Definition)
     positive_lemma = models.ManyToManyField(Context_token, blank=True, related_name="positive_lemma")
     negative_lemma = models.ManyToManyField(Context_token, blank=True, related_name="negative_lemma")
-    global_pos_tag = models.ManyToManyField(PoS_tag)
+    global_pos_tag = models.ManyToManyField(Pos_frequency)
     frequency_w2v = models.IntegerField(null=True)
     disambiguations = models.ManyToManyField(Definition, blank=True, related_name="disambiguation_definition")
     collocations = models.ManyToManyField(Collocation)

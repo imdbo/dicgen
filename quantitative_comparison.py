@@ -83,7 +83,6 @@ if __name__ == "__main__":
             rouge, bleu, f1 = f1_score(definition.lower(), merriam_text.lower())
             #print(rouge, bleu, f1)
             if len(results) < 100:
-                if rouge > 0.01 :#filter broken links/articles
                     print(len(results))
                     results[lemma] = {}
                     results[lemma]['rouge'] = round(rouge, 2)
