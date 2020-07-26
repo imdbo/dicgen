@@ -1,87 +1,103 @@
-{% include 'dictionary/header.html' %}
+{% include 'dictionary/index.html' %}
 {% block home %}
 <div class="container-fluid ">
     <div class="row">
-    <div class="row centrado50 justify-content-center">
-        <div class="col-lg text-center mx-auto">
-            <div class="row mt-5 text-center centrado50 justify-content-center">
-                <div class="col-lg text-center mx-auto">
-                    <h2 class="title mt-5">{{texts.section_1.title}}</h2>
-                    <hr>
-                    <p class="mt-2">{{texts.section_1.info}}</p>
-                </div>
-            </div>
-            <div class="row mt-5">
-                <div class="col-lg text-center mx-auto ">
-                    <div class="card" style="width: 20rem; margin:auto">
-                        <div class="card-body">
-                            <i data-feather="activity"></i>
-                            <h5 class="card-title">{{texts.section_1.card_1.card_title}}</h5>
-                            <p class="card-text">{{texts.section_1.card_1.card_content}}</p>
-                            <a href="https://dumps.wikimedia.org/" class="btn btn-primary">{{texts.buttons.know_more}}</a>
-                        </div>
+        <div class="row centrado60 justify-content-center closer-margin">
+            <div class="col-lg text-center mx-auto">
+                <div class="row mt-5 text-center centrado60 justify-content-center">
+                    <div class="col-lg text-center mx-auto">
+                        <h2 class="title mt-5">{{texts.section_1.title}}</h2>
+                        <hr>
+                        <p class="mt-2">{{texts.section_1.info}}</p>
                     </div>
                 </div>
-                <div class="col-lg text-center mx-auto">
-                    <div class="card  text-center" style="width: 20rem; margin:auto">
-                        <div class="card-body">
-                            <i data-feather="trending-up"></i>
-                            <h5 class="card-title">{{texts.section_1.card_2.card_title}}</h5>
-                            <p class="card-text">{{texts.section_1.card_2.card_content}}</p>
-                            </p>
-                            <a href="https://cran.r-project.org/web/packages/textrank/vignettes/textrank.html" class="btn btn-primary">{{texts.buttons.know_more}}</a>
+                <div class="row mt-5">
+                    <div class="col-lg text-center ">
+                        <div class="card" style="width: 20rem;height: 20rem; max-height: 20rem; margin:auto">
+                            <div class="card-body">
+                                <i class="fa fa-wikipedia-w fa-3x" aria-hidden="true"></i>
+                                <h5 class="card-title">{{texts.section_1.card_1.card_title}}</h5>
+                                <p class="card-text">{{texts.section_1.card_1.card_content}}</p>
+                                <a href="https://dumps.wikimedia.org/"
+                                    class="btn btn-primary">{{texts.buttons.know_more}}</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-lg text-center mx-auto">
-                    <div class="card" style="width: 20rem; margin:auto">
-                        <div class="card-body">
-                            <i data-feather="bar-chart"></i>
-                            <h5 class="card-title">{texts.{section_1.card_3.card_title}}</h5>
-                            <p class="card-text">{{texts.section_1.card_3.card_content}}</p>
-                            </p>
-                            <a href="https://en.wikipedia.org/wiki/Word2vec" class="btn btn-primary">{{texts.buttons.know_more}}</a>
+                    <div class="col-lg mb-5 text-center">
+                        <div class="card" style="width: 20rem;height: 20rem; max-height: 20rem; margin:auto">
+                            <div class="card-body">
+                                <i data-feather="trending-up"></i>
+                                <h5 class="card-title">{{texts.section_1.card_2.card_title}}</h5>
+                                <p class="card-text">{{texts.section_1.card_2.card_content}}</p>
+                                </p>
+                                <a href="https://cran.r-project.org/web/packages/textrank/vignettes/textrank.html"
+                                    class="btn btn-primary">{{texts.buttons.know_more}}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg text-center">
+                        <div class="card" style="width: 20rem; max-height: 20rem; margin:auto">
+                            <div class="card-body">
+                                <i data-feather="bar-chart"></i>
+                                <h5 class="card-title">{{texts.section_1.card_3.card_title}}</h5>
+                                <p class="card-text">{{texts.section_1.card_3.card_content}}</p>
+                                </p>
+                                <a href="https://en.wikipedia.org/wiki/Word2vec"
+                                    class="btn btn-primary">{{texts.buttons.know_more}}</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-    <div class="row home-content gray">
-    <div class="col-lg centrado50 text-center">
-                <div>
-                    <h2 class="title mt-5">{{texts.section_2.title}}</h2>
-                    <hr>
-                    <p class="mt-2">{{texts.section_2.info}}</p>
+    <div class="gray border-top justify-content-center">
+        <div class="row mt-5 home-content centrado60">
+        <div class="col-lg centrado60 text-center">
+            <div class="mb-5 mt-5">
+                <div class="row justify-content-center align-middle">
+                    <h2 class="title">{{texts.section_2.title}}</h2>
                 </div>
+                <hr>
+                <p class="mt-2">{{texts.section_2.info}}</p>
+            </div>
             <div class="row mt-5">
-                <div class="card centrado50 " style="width: 20rem;">
-                    <div class="card-body">
+                <div class="col-lg mt-5 text-center mx-auto ">
+                    <div class="card " style="width: 15rem; height:10rem;">
+                        <div class="justify-content-center align-middle card-body">
+                            <i class="fa fa-3x fa-sort-alpha-desc" aria-hidden="true"></i>
                             <p class="card-text">{{texts.section_2.card_1.card_title}}</p>
                         </div>
-                </div>
-                <div class="card  " style="width: 20rem;">
-                    <div class="card-body">
-                        <p class="card-text">{{texts.section_2.card_2.card_title}}</p>
                     </div>
                 </div>
-                <div class="card centrado50 " style="width: 20rem;">
-                    <div class="card-body">
-                        <p class="card-text">{{texts.section_2.card_3.card_title}}</p>
+                <div class="col-lg mt-5 text-center mx-auto ">
+                    <div class="card" style="width: 15rem; height:10rem;">
+                        <div class="card-body">
+                            <i class="fa fa-3x fa-random" aria-hidden="true"></i>
+                            <p class="card-text">{{texts.section_2.card_2.card_title}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg mt-5 text-center mx-auto ">
+                    <div class="card" style="width: 15rem; height:10rem;">
+                        <div class="card-body">
+                            <i class="fa fa-3x fa-link" aria-hidden="true"></i>
+                            <p class="card-text">{{texts.section_2.card_3.card_title}}</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        </div>
-{% endblock %}
+    </div>
+    </div>
+    {% endblock %}
 
-<style>
-.home-content {
-    padding-bottom: 10rem;
-}
-</style>
+    <style>
+        .home-content {
+            padding-bottom: 10rem;
+        }
+    </style>
 
-<script>
-    feather.replace({ class: 'activity', 'stroke-width': 0.75, 'height': 70, 'width': 70, 'color': 'lightbue' })
-</script>
+    <script>
+        feather.replace({ class: 'activity', 'stroke-width': 0.75, 'height': 70, 'width': 70, 'color': 'lightbue' })
+    </script>

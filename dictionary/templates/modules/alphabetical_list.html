@@ -1,8 +1,12 @@
 <div id="alphabetical_box" class="row">
     <div id="lemma" class="col-md-12 text-center mx-auto">
-        <ul class="list-group list-group-flush">
+        <ul stlye="list-style-type: none;">
             {% for w in all_lemmas %}
-                <li class="inline list-group-item"><a href="/search_lemma/?search_box={{w}}">{{w}}</a>&nbsp;</li>
+                {% if last_queried and last_queried == w %}
+                    <li><a  class="active" href="/autodict/search_lemma/?search_box={{w}}">{{w}}</a></li>
+                {% else %}
+                    <li><a href="/autodict/search_lemma/?search_box={{w}}">{{w}}</a></li>
+                {% endif %}
             {% endfor %}
         </ul>
     </div>
@@ -12,10 +16,13 @@
     #alphabetical_box {
         max-width: 15rem;
         overflow-x: scroll;
-        max-height: 100rem;
+        max-height: 100%;
         position: fixed;
         visibility: hidden;
+        z-index: 2;
+        background-color: white;
     }
+    
 </style>
 
 <script>

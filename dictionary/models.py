@@ -1,7 +1,11 @@
 from django.db import models
 
 # Create your models here.
-
+class Collocation(models.Model):
+    collocation = models.CharField
+    def __str__(self):
+        return self.collocation
+        
 class PoS_tag(models.Model):
     pos = models.CharField(max_length=20, unique=True)
     def __str__(self):
@@ -13,10 +17,10 @@ class Pos_frequency(models.Model):
     def __str__(self):
         return self.pos.pos
 
-class Collocation(models.Model):
-    collocation = models.CharField(max_length=200)
+class Example(models.Model):
+    example = models.CharField(max_length=1000)
     def __str__(self):
-        return self.collocation
+        return self.example
 
 class Definition(models.Model):
     definition = models.CharField(max_length=5000)
@@ -41,6 +45,6 @@ class Lemma (models.Model):
     global_pos_tag = models.ManyToManyField(Pos_frequency)
     frequency_w2v = models.IntegerField(null=True)
     disambiguations = models.ManyToManyField(Definition, blank=True, related_name="disambiguation_definition")
-    collocations = models.ManyToManyField(Collocation)
+    examples = models.ManyToManyField(Example)
     def __str__(self):
         return self.lemma

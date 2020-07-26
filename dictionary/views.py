@@ -6,7 +6,7 @@ from django.views.generic import ListView
 from django.http import HttpResponse
 from .serializers import LemmaSerializer
 from rest_framework import viewsets
-from .levehnstein import Levenshtein
+from .levenshtein import Levenshtein
 import math
 distance = Levenshtein().find_distance
 
@@ -54,6 +54,7 @@ def search_lemma(request):
         results = []
         context = {}
         mode = ''
+        found = True
         query_lemma = request.GET.get('search_box', None)
         if query_lemma != '':
             lowered = query_lemma.lower()
@@ -70,13 +71,16 @@ def search_lemma(request):
                 if close_matches:
                     results = Lemma.objects.all().filter(lemma__in=close_matches)
                 else:
-                    mode = 'internal match'
+                    mode = 'the word containes the original search input'
                     results = Lemma.objects.filter(lemma__contains=lowered)
             if not results:
                 results = [f'no match found for {query_lemma}']
                 mode = ''
-        print()
-        context = {'results': results, 'all_lemmas': ALL_LEMMAS, 'search_type': mode}
+                found = False
+        else:
+            found = False
+
+        context = {'results': results, 'all_lemmas': ALL_LEMMAS, 'search_type': mode, 'found': found, 'last_queried': lowered}
         texts = read_text_template('dictionary/texts/resultbox.json')
         context['texts'] = texts[LANGUAGE]
     return render(request, 'dictionary/resultbox.html', context)

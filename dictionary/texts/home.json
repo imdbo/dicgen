@@ -2,25 +2,25 @@
     "en": {
         "section_1": {
             "title": "Automatic dictionary generation",
-            "info": "This website is the result of a first attempt at automatically generating a dictionary. This is a prototype. We have combined some of the most common NLP techniques to create a dictionary with data extracted from Wikipedia",
+            "info": "This website is the result of a first attempt at automatically generating a dictionary. This is a prototype. We have combined some of the most common NLP techniques to create a dictionary with data extracted from Wikipedia.",
             "card_1": {
                 "card_title": "Based on Wikipedia",
-                "card_content": "All the data used for the generation of this dictionary comes straight from the Wikipedia text-only dump. Click below to know more about Wikimedia and Wikidumps"
+                "card_content": "All the data used for the generation of this dictionary has been extracted straight from a recent Wikipedia text-only dump. Click below to know more about Wikimedia and Wikidumps and its use cases."
             },
             "card_2": {
                 "card_title": "TextRank-based summarization",
-                "card_content": "All the definitions are the resulting of applying the TextRank algorithm on the original Wikipedia entry, effectively generating a short summary of the original entry, with the key information"
+                "card_content": "All the definitions are the resulting of applying the TextRank algorithm on the original Wikipedia entry, effectively generating a short summary of the original entry, with the key information."
             },
             "card_3": {
                 "card_title": "Word Embeddings",
-                "card_content": "We use word embedding models such as Word2Vec to generate only entries with relevant lemmas and to offer contextually similar lemmas (this is not equivalent to synonymity)"
+                "card_content": "We use word embedding models such as Word2Vec to generate only entries with relevant lemmas and to offer contextually similar lemmas (this is not equivalent to synonymity)."
             }
         },
         "section_2": {
             "title": "Different search modes",
             "info": "The way we access information in a dictionary is very important. We want to go beyond the standard search bar and allow the user to have more control over waht they want to find. For this reason, we have implemented different ways to search for a lemma in our dictionary.",
             "card_1": {
-                "card_title": "Search new lemmas by alphabetical order"
+                "card_title": "Search new lemmas by alphabetical order."
             },
             "card_2": {
                     "card_title": "Similar suggestions are returned when there is no exact match. "

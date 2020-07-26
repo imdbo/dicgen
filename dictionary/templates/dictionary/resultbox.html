@@ -1,4 +1,4 @@
-{% include 'dictionary/header.html' %}
+{% include 'dictionary/index.html' %}
 {% load split %}
 {% load replace %}
 {% load declare %}
@@ -8,12 +8,15 @@
 <div class="container ">
     <div class="row">
         <div class="col-lg mx-auto ">
-        {% if alphabetical_search.found %}
+        {% if found is True %}
             {% for r in results %}
             <div class="row">
                 <div class="col-lg">
                         <div class="row">
-                            <h1>{{r}} {{search_type}}</h1>
+                        <blockquote class="blockquote">
+                            <h1 class="mb-0">{{r}}</h1> 
+                            <footer class="blockquote-footer">{{search_type}}</footer>
+                        </blockquote>
                         </div>
                         {% for definition in r.definition.all %}
                         <div class="row mrpr-5">
@@ -36,7 +39,6 @@
                                 {% endwith %}
                             </div>
                         </div>
-                        <hr>
                         {% endfor %}
                         <div class="row">
                             <div class="col-lg">
@@ -44,9 +46,10 @@
                                 <div class="row text-left pr-5 pl-5">
                                     <ul>
                                         {% for lemma in r.positive_lemma.all %}
-                                        <li style="display:inline"> {% if lemma.lower in all_lemmas %}
+                                        <li style="display:inline"> 
+                                        {% if lemma.lower in all_lemmas %}
                                             <span class="highlighted_lemma"><a
-                                                    href="/search_lemma/?search_box={{w}}">{{lemma}}</a>&nbsp;</span>
+                                                    href="/search_lemma/?search_box={{lemma}}">{{lemma}}</a>&nbsp;</span>
                                             {% else %}
                                             <span> {{lemma}}&nbsp;</span>
                                             {% endif %}
@@ -59,38 +62,35 @@
                 </div>
                 <div class="row">
                     <div class="col-lg">
-                        <h5>{{texts.collocations}}</h5>
+                        <h5>{{texts.examples}}</h5>
                         <div class="row text-left pr-5 pl-5">
                             <ul>
-                                {% for c in r.collocations.all %}
-                                <li>{% for w in c.collocation|split:" " %}
+                                {% for c in r.examples.all %}
+                                <li>{% for w in c.example|split:" " %}
                                     {% if w in all_lemmas %}
                                     <span class="highlighted_lemma"><a
                                             href="/search_lemma/?search_box={{w}}">{{w}}</a>&nbsp;</span>
                                     {% else %}
                                     <span> {{w}}&nbsp;</span>
                                     {% endif %}
-                                    {% endfor %}</li>
-                                <div>original article</div>
+                                    {% endfor %}...</li>
                                 {% endfor %}
                             </ul>
                         </div>
                     </div>
                 </div>
+            <hr>
             {% endfor %}
             {% else %}
                 <div class="d-flex flex-column">
                    <span><h5>There is no match for your query, maybe you were looking for one of the following</h5></span>
                     {% for r in results %}
                         {% if r.lemma in all_lemmas %}
-                        <div class="row">
-                            <span class="highlighted_lemma"><a
-                                href="/search_lemma/?search_box={{w}}">{{r.lemma}}</a>&nbsp;</span>
-                        {% else %}
-                        <span> {{r}}&nbsp;</span>
-                        {% endif %}
+                        <div>
+                            <span class="highlighted_lemma"><a href="/search_lemma/?search_box={{r.lemma}}">{{r.lemma}}</a>
+                        </div>
+                        {% endif %} 
                     {% endfor %}
-                    </div>
                 </div>
             {% endif %}
         </div>
