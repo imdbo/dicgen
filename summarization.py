@@ -17,7 +17,6 @@ from dictionary.models import *
 from multiprocessing import Process
 import time 
 number_max_lemmas = 300000
-cores = 6
 make_smaller_df = False
 '''
     to retrieve examples and examples from the entire
@@ -47,26 +46,27 @@ if __name__ == '__main__':
                         smaller_df['long_entry'].append(entry)
         pd.DataFrame.from_dict(smaller_df).to_csv('smaller_df.csv')
 
-    df = pd.read_csv('smaller_df.csv', low_memory=False)
-    headwords = df['headword']
-    full_articles = df['long_entry']
-    vocab.generate_def(headwords, full_articles)
+    df = pd.read_csv('data.csv', low_memory=False, chunksize=100000)
+    for df in df:
+        headwords = df['headword']
+        full_articles = df['long_entry']
+        vocab.generate_def(headwords, full_articles)
 
-    ''' 
-    total_length = len(headwords)
-    chunkedchunk = math.floor(total_length/cores)
-    first_new_row = 0 
-    split_df = []
-    to_pass = 0
-    
-    while first_new_row < total_length:
-        print(chunkedchunk)
-        split_df.append([headwords[first_new_row:first_new_row+chunkedchunk], full_articles[first_new_row:first_new_row+chunkedchunk]])
-        first_new_row += chunkedchunk
-        parallel_retrieval = Process(target = vocab.generate_def, args=(split_df[to_pass][0],split_df[to_pass][1]))
-        parallel_retrieval.start()
-        to_pass += 1
-    '''
+        ''' 
+        total_length = len(headwords)
+        chunkedchunk = math.floor(total_length/cores)
+        first_new_row = 0 
+        split_df = []
+        to_pass = 0
+        
+        while first_new_row < total_length:
+            print(chunkedchunk)
+            split_df.append([headwords[first_new_row:first_new_row+chunkedchunk], full_articles[first_new_row:first_new_row+chunkedchunk]])
+            first_new_row += chunkedchunk
+            parallel_retrieval = Process(target = vocab.generate_def, args=(split_df[to_pass][0],split_df[to_pass][1]))
+            parallel_retrieval.start()
+            to_pass += 1
+        '''
     for lemma, data in vocab.lemma_map.items():
         if lemma not in imported:
             imported.append(lemma)

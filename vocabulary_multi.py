@@ -61,6 +61,7 @@ class Vocabulary():
         self.pos_tags = {}
         self.words_only = re.compile(r'\w+')
         self.regex_disambiguation = re.compile(r'\(\w+\)')
+        self.digits_filter = re.compile(r'\d+')
         self.disambiguations = {}
         #self.ignore_if_in = ["may also refer to", "can refer to"]
 
@@ -305,24 +306,26 @@ class Vocabulary():
             hw = headwords[i]
             l_entry = full_articles[i]
             disambiguation = False
+
             if len(l_entry) > 30:
                 l_entry = l_entry.replace('\n', ' ')
                 l_entry = l_entry.replace(',', ' ')
                 l_entry = l_entry.split('.')
+
                 for s in l_entry:
                     s = ' '.join(re.findall( self.words_only, s))
                 l_entry = '.'.join(l_entry)
                 self.for_examples(l_entry.split('.'))
                 
-                if isinstance(hw, str) and not hw.isnumeric() and len(hw) > 2:
+                if isinstance(hw, str) and not re.search(self.digits_filter, hw) and len(hw) > 2:
                     hw = hw.lower()
-                    hw_split = hw.split()
                     if hw not in self.lemma_index:
                         self.lemma_index[hw] = {}
+                        self.disambiguations[hw] = {}
                     if re.search(self.regex_disambiguation, hw):
                         disambiguation = True
+                        hw = hw.split()[0]
 
-                    hw = hw_split[0]
                     size_entry = 0
                     cut_entry = []
                     full_article = l_entry
@@ -337,6 +340,7 @@ class Vocabulary():
                     for i in range(len(cut_entry)):
                         sentence = re.findall(
                             self.words_only, cut_entry[i])
+
                         for word in sentence:
                             if word not in self.word_index:
                                 self.word_count += 1
@@ -346,6 +350,7 @@ class Vocabulary():
                     new_entry = {"definition": '.'.join([cut_entry[k] for k in self.calculate_similarity(self.sentences_to_matrix(cut_entry))]),
                                     "pos_stats": current_pos
                                     }
+
                     if len(new_entry["definition"]) > 5:
                         new_entry["definition"] = self.sanitize_text(new_entry["definition"])
                         if disambiguation == False:
@@ -356,9 +361,9 @@ class Vocabulary():
                                 self.lemma_map[hw]["definitions"] = [new_entry]
                         else:
                             if "definitions" not in self.lemma_map[hw]["disambiguations"]:
-                                self.disambiguations[hw]["disambiguations"]["definitions"] = new_entry
+                                self.disambiguations[hw]["definitions"] = new_entry
                             else:
-                                self.disambiguations[hw]["disambiguations"]["definitions"].append(
+                                self.disambiguations[hw]["definitions"].append(
                                     new_entry)
                         if 'inflection' not in self.lemma_map[hw]:
                             self.lemma_map[hw]['inflection'] = inflection
